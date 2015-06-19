@@ -17,7 +17,9 @@ def get_re_from_single_line(line):
     """
     _line = line.strip()
     # Deal with file name end with ` `
-    line = _line + " " if _line.endswith("\\") and line.endswith(" ") else _line
+    line = (
+        _line + " " if _line.endswith("\\") and line.endswith(" ") else _line
+    )
     line = line.replace("\\ ", " ")
     # Deal with `**` in folder path
     line = line.replace("**", "*")
