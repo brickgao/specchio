@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import fnmatch
+import os
+import re
 
 
 def get_re_from_single_line(line):
@@ -18,7 +20,9 @@ def get_re_from_single_line(line):
     _line = line.strip()
     # Deal with file name end with ` `
     line = (
-        _line + " " if _line.endswith("\\") and line.endswith(" ") else _line
+        _line + " " if _line.endswith("\\") and (
+            line.endswith(" \r\n") or line.endswith("\n")
+        ) else _line
     )
     line = line.replace("\\ ", " ")
     # Deal with `**` in folder path
@@ -48,3 +52,46 @@ def get_re_from_single_line(line):
             return re_type, fnmatch.translate(line[1:])
         else:
             return re_type, fnmatch.translate(line)
+
+
+def dfs_get_gitignore(base_path):
+    """Use depth first search to get all `.gitignore` under base_path
+
+    :param base_path: str -- the path to deal with
+    :return: list of str -- the path of all `.gitignore`
+    """
+    base_path = os.path.abspath(base_path)
+    dir_list = os.listdir(base_path)
+    result = []
+    for file_or_dir in dir_list:
+        file_or_dir_path = os.path.join(base_path, file_or_dir)
+        if file_or_dir == ".gitignore" and not os.path.isdir(file_or_dir_path):
+            result.append(file_or_dir_path)
+        elif os.path.isdir(file_or_dir_path):
+            # Continue to search `.gitignore`
+            result += dfs_get_gitignore(file_or_dir_path)
+    return result
+
+
+def get_all_re(gitignore_path_list):
+    """Get all compiled regular expression from gitignore_list
+
+    :param gitignore_path_list: list of str -- the path of all `.gitignore`
+    :return: dict -- the absolute path of `.gitignore` is the key,
+                     the value in dict is another dict, like
+                     result[path of `.gitignore`][key2]:
+                        result[path][1]: list of hash to pattern
+                        result[path][2]: list of negate ignore path to pattern
+                        result[path][3]: list of ignore path to pattern
+    """
+    result = {}
+    for gitignore_path in gitignore_path_list:
+        with open(gitignore_path, "r") as gitignore_file:
+            result[gitignore_path] = {1: [], 2: [], 3: []}
+            for line in gitignore_file:
+                ignore_type, ignore_pattern = get_re_from_single_line(line)
+                # If match some file
+                if ignore_type:
+                    _re = re.compile(ignore_pattern)
+                    result[gitignore_path][ignore_type].append(_re)
+    return result
