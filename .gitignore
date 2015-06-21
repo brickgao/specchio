@@ -69,15 +69,7 @@ target/
 out
 gen
 
-### Example user template template
-### Example user template
+### For System temporary file
 
-# IntelliJ project files
-.idea
-*.iml
-out
-gen
-
-
-### For OS X
+# OS X temporary file
 .DS_Store
