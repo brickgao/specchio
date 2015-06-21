@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 from unittest import TestCase
 
 import mock
 
-from specchio.utils import get_re_from_single_line
+from specchio.utils import (dfs_get_gitignore, get_all_re,
+                            get_re_from_single_line)
 
 
 class GetReFromSingleLineTest(TestCase):
@@ -57,3 +59,46 @@ class GetReFromSingleLineTest(TestCase):
         result = get_re_from_single_line("/too_young.py")
         self.assertEqual(result[0], 3)
         _fnmatch.translate.assert_called_with("too_young.py")
+
+
+class DFSGetGitignoreTest(TestCase):
+
+    @mock.patch("specchio.utils.os")
+    def test_dfs_get_gitignore(self, _os):
+        _os.path.abspath.return_value = "/young/simple"
+        _os.listdir.return_value = ["naive", ".gitignore"]
+        _os.path.join.side_effect = [
+            "/young/simple/naive",
+            "/young/simple/.gitignore"
+        ]
+        _os.path.isdir.return_value = False
+        result = dfs_get_gitignore("/young/simple")
+        self.assertEqual(
+            result,
+            ["/young/simple/.gitignore"]
+        )
+
+
+class GetAllReTest(TestCase):
+
+    # Don't use mock_open, it doesn't support iter for file
+    @mock.patch("__builtin__.open")
+    @mock.patch("specchio.utils.re")
+    @mock.patch("specchio.utils.get_re_from_single_line")
+    def test_get_all_re(self, _get_re, _re, _open):
+        _open.return_value = io.StringIO(u"simple text")
+        _get_re.return_value = (1, "re_text")
+        _re.compile.return_value = "compiled_re"
+        result = get_all_re(["/young/simple/.gitignore"])
+        _get_re.assert_called_once_with("simple text")
+        _re.compile.assert_called_once_with("re_text")
+        self.assertEqual(
+            result,
+            {
+                "/young/simple/.gitignore": {
+                    1: ["compiled_re"],
+                    2: [],
+                    3: []
+                }
+            }
+        )
