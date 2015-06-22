@@ -12,10 +12,10 @@ def get_re_from_single_line(line):
 
     :param line: str -- single line from `.gitignore`
     :return: tuple
-        0, None -- noting to pattern
-        1, str -- hash to pattern
-        2, str -- negate ignore path to pattern
-        3, str -- ignore path to pattern
+        0, None -- noting to match
+        1, str -- hash to match
+        2, str -- negate ignore path to match
+        3, str -- ignore path to match
     """
     _line = line.strip()
     # Deal with file name end with ` `
@@ -80,9 +80,9 @@ def get_all_re(gitignore_path_list):
     :return: dict -- the absolute path of `.gitignore` is the key,
                      the value in dict is another dict, like
                      result[path of `.gitignore`][key2]:
-                        result[path][1]: list of hash to pattern
-                        result[path][2]: list of negate ignore path to pattern
-                        result[path][3]: list of ignore path to pattern
+                        result[path][1]: list of hash to match
+                        result[path][2]: list of negate ignore path to match
+                        result[path][3]: list of ignore path to match
     """
     result = {}
     for gitignore_path in gitignore_path_list:
