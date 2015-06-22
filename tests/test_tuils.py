@@ -56,7 +56,7 @@ class GetReFromSingleLineTest(TestCase):
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_with_head_slash(self, _fnmatch):
-        result = get_re_from_single_line("/too_young.py")
+        result = get_re_from_single_line("./too_young.py")
         self.assertEqual(result[0], 3)
         _fnmatch.translate.assert_called_with("too_young.py")
 
