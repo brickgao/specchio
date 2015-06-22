@@ -121,3 +121,17 @@ def remote_rm(dst_ssh, dst_path):
     dst_command = "\"rm -rf {}\"".format(dst_path)
     command = "ssh " + dst_ssh + " " + dst_command
     os.popen(command)
+
+
+def remote_mv(dst_ssh, src_path, dst_path):
+    """Move file or folder remotely by using mv
+
+    :param dst_ssh: str -- user name and host name of destination path
+                           just like: user@host
+    :param src_path: str -- source of `mv` operator
+    :param dst_path: str -- destination of `mv` operator
+    :return:
+    """
+    dst_command = "\"mv {0} {1}\"".format(src_path, dst_path)
+    command = "ssh " + dst_ssh + " " + dst_command
+    os.popen(command)
