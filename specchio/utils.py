@@ -130,8 +130,21 @@ def remote_mv(dst_ssh, src_path, dst_path):
                            just like: user@host
     :param src_path: str -- source of `mv` operator
     :param dst_path: str -- destination of `mv` operator
-    :return:
+    :return: None
     """
     dst_command = "\"mv {0} {1}\"".format(src_path, dst_path)
     command = "ssh " + dst_ssh + " " + dst_command
+    os.popen(command)
+
+
+def rsync(dst_ssh, src_path, dst_path):
+    """Rsync file remotely
+
+    :param dst_ssh: str -- user name and host name of destination path
+                           just like: user@host
+    :param src_path: str -- source of file
+    :param dst_path: str -- destination of file
+    :return: None
+    """
+    command = "rsync -avz {0} {1}:{2}".format(src_path, dst_ssh, dst_path)
     os.popen(command)
