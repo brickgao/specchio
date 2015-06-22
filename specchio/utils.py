@@ -47,9 +47,9 @@ def get_re_from_single_line(line):
             re_type = 3
         # Deal with escape string
         line = line.replace("\\", "")
-        if line.startswith("/"):
-            # Dealing with line start with `/`, just remove the head
-            return re_type, fnmatch.translate(line[1:])
+        if line.startswith("./"):
+            # Dealing with line start with `./`, just remove the head
+            return re_type, fnmatch.translate(line[2:])
         else:
             return re_type, fnmatch.translate(line)
 
