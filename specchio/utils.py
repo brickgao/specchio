@@ -95,3 +95,29 @@ def get_all_re(gitignore_path_list):
                     _re = re.compile(ignore_pattern)
                     result[gitignore_path][ignore_type].append(_re)
     return result
+
+
+def remote_create_folder(dst_ssh, dst_path):
+    """Create folder remotely by using ssh
+
+    :param dst_ssh: str -- user name and host name of destination path
+                           just like: user@host
+    :param dst_path: str -- destination path
+    :return: None
+    """
+    dst_command = "\"mkdir -p {}\"".format(dst_path)
+    command = "ssh " + dst_ssh + " " + dst_command
+    os.popen(command)
+
+
+def remote_rm(dst_ssh, dst_path):
+    """Remove file or folder remotely by using ssh
+
+    :param dst_ssh: str -- user name and host name of destination path
+                           just like: user@host
+    :param dst_path: str -- destination path
+    :return: None
+    """
+    dst_command = "\"rm -rf {}\"".format(dst_path)
+    command = "ssh " + dst_ssh + " " + dst_command
+    os.popen(command)

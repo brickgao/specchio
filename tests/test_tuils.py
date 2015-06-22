@@ -7,7 +7,8 @@ from unittest import TestCase
 import mock
 
 from specchio.utils import (dfs_get_gitignore, get_all_re,
-                            get_re_from_single_line)
+                            get_re_from_single_line, remote_create_folder,
+                            remote_rm)
 
 
 class GetReFromSingleLineTest(TestCase):
@@ -102,3 +103,21 @@ class GetAllReTest(TestCase):
                 }
             }
         )
+
+
+class RemoteCreateFloder(TestCase):
+
+    @mock.patch("specchio.utils.os")
+    def test_remote_create_folder(self, _os):
+        _os.popen.return_value = True
+        remote_create_folder("user@host", "/a/b/")
+        _os.popen.assert_called_once_with("ssh user@host \"mkdir -p /a/b/\"")
+
+
+class RemoteRm(TestCase):
+
+    @mock.patch("specchio.utils.os")
+    def test_remote_rm(self, _os):
+        _os.popen.return_value = True
+        remote_rm("user@host", "/a/b.py")
+        _os.popen.assert_called_once_with("ssh user@host \"rm -rf /a/b.py\"")
