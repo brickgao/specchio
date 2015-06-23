@@ -35,31 +35,31 @@ class GetReFromSingleLineTest(TestCase):
     def test_get_re_from_simple_line(self, _fnmatch):
         result = get_re_from_single_line("excited/*.*")
         self.assertEqual(result[0], 3)
-        _fnmatch.translate.assert_called_with("excited/*.*")
+        _fnmatch.translate.assert_called_once_with("excited/*.*")
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_with_negate_pattern(self, _fnmatch):
         result = get_re_from_single_line("!too_simple.py")
         self.assertEqual(result[0], 2)
-        _fnmatch.translate.assert_called_with("too_simple.py")
+        _fnmatch.translate.assert_called_once_with("too_simple.py")
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_with_double_asterisk(self, _fnmatch):
         result = get_re_from_single_line("young/**/simple/**/naive")
         self.assertEqual(result[0], 3)
-        _fnmatch.translate.assert_called_with("young/*/simple/*/naive")
+        _fnmatch.translate.assert_called_once_with("young/*/simple/*/naive")
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_with_space(self, _fnmatch):
         result = get_re_from_single_line("too\\ young.py")
         self.assertEqual(result[0], 3)
-        _fnmatch.translate.assert_called_with("too young.py")
+        _fnmatch.translate.assert_called_once_with("too young.py")
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_with_head_slash(self, _fnmatch):
         result = get_re_from_single_line("./too_young.py")
         self.assertEqual(result[0], 3)
-        _fnmatch.translate.assert_called_with("too_young.py")
+        _fnmatch.translate.assert_called_once_with("too_young.py")
 
 
 class DFSGetGitignoreTest(TestCase):
