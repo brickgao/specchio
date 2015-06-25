@@ -25,9 +25,12 @@ class SpecchioEventHandler(FileSystemEventHandler):
         self.src_path = src_path
         self.dst_ssh = dst_ssh
         self.dst_path = dst_path
+        self.git_path = os.path.join(self.src_path, ".git/")
         super(SpecchioEventHandler, self).__init__()
 
     def is_ignore(self, file_or_dir_path):
+        if file_or_dir_path.startswith(self.git_path):
+            return True
         for gitignore_folder_path in self.gitignore_list:
             gitignore_path = gitignore_folder_path + ".gitignore"
             if file_or_dir_path.startswith(gitignore_folder_path):
