@@ -149,7 +149,7 @@ class RsyncTest(TestCase):
 class LoggingConfigurationTests(TestCase):
 
     def setUp(self):
-        self.logger = logging.getLogger("speechio")
+        self.logger = logging.getLogger("specchio")
         self.orig_handlers = self.logger.handlers
         self.logger.handlers = []
         self.level = self.logger.level
@@ -159,9 +159,8 @@ class LoggingConfigurationTests(TestCase):
         self.logger.level = self.level
 
     def test_basic_configuration(self):
-        print 'before'
+
         init_logger()
-        print 'done'
 
         self.assertEqual(self.logger.level, logging.DEBUG)
         self.assertEqual(len(self.logger.handlers), 1)
@@ -182,15 +181,15 @@ class LoggingConfigurationTests(TestCase):
 class LoggingOutputTest(TestCase):
 
     def test_logger(self):
-        logger = logging.getLogger("speechio")
+        logger = logging.getLogger("specchio")
         with LogCapture() as log_capture:
             logger.debug("DEBUG Test")
             logger.info("INFO Test")
             logger.warning("WARNING Test")
             logger.error("ERROR Test")
             log_capture.check(
-                ("speechio", "DEBUG", "DEBUG Test"),
-                ("speechio", "INFO", "INFO Test"),
-                ("speechio", "WARNING", "WARNING Test"),
-                ("speechio", "ERROR", "ERROR Test")
+                ("specchio", "DEBUG", "DEBUG Test"),
+                ("specchio", "INFO", "INFO Test"),
+                ("specchio", "WARNING", "WARNING Test"),
+                ("specchio", "ERROR", "ERROR Test")
             )
