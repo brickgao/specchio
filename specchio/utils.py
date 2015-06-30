@@ -7,6 +7,8 @@ import logging.config
 import os
 import re
 
+from specchio.config.logging import LOGGING_CONFIG
+
 
 def get_re_from_single_line(line):
     """Get regular expression from a single line in `.gitignore`
@@ -153,7 +155,7 @@ def rsync(dst_ssh, src_path, dst_path):
 
 
 def init_logger():
-    logging.config.fileConfig("specchio/config/logging.conf")
+    logging.config.dictConfig(LOGGING_CONFIG)
 
 
 logger = logging.getLogger("specchio")
