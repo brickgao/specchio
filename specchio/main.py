@@ -35,6 +35,6 @@ def main():
         observer.join()
     else:
         print """Specchio is a tool that can help you rsync your file
-it use `.gitignore` in git to mark which file is ignored.
+it use `.gitignore` in git to discern which file is ignored.
 
 Usage: specchio src/ user@host:dst"""
