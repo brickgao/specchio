@@ -153,7 +153,7 @@ def rsync(dst_ssh, src_path, dst_path):
 
 
 def init_logger():
-    logging.config.fileConfig('speechio/config/logging.conf')
+    logging.config.fileConfig("specchio/config/logging.conf")
 
 
-logger = logging.getLogger()
+logger = logging.getLogger("specchio")
