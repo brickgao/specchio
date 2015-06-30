@@ -7,7 +7,7 @@ import time
 from watchdog.observers import Observer
 
 from specchio.handlers import SpecchioEventHandler
-from specchio.utils import logger
+from specchio.utils import init_logger, logger
 
 
 def main():
@@ -17,12 +17,13 @@ def main():
 
     :return: None
     """
-    if len(sys.argv) == 2:
-        src_path = sys.argv[0].strip()
-        dst_ssh, dst_path = sys.argv[1].strip().split(":")
+    if len(sys.argv) == 3:
+        src_path = sys.argv[1].strip()
+        dst_ssh, dst_path = sys.argv[2].strip().split(":")
         event_handler = SpecchioEventHandler(
             src_path=src_path, dst_ssh=dst_path, dst_path=dst_path
         )
+        init_logger()
         logger.info("Initialize Specchio")
         observer = Observer()
         observer.schedule(event_handler, src_path, recursive=True)
@@ -34,7 +35,7 @@ def main():
             observer.stop()
         observer.join()
     else:
-        print """Specchio is a tool that can help you rsync your file
+        print """Specchio is a tool that can help you rsync your file,
 it use `.gitignore` in git to discern which file is ignored.
 
 Usage: specchio src/ user@host:dst"""
