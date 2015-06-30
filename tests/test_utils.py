@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import io
+import logging
+import sys
 from unittest import TestCase
 
 import mock
+from testfixtures import LogCapture
 
 from specchio.utils import (dfs_get_gitignore, get_all_re,
-                            get_re_from_single_line, remote_create_folder,
-                            remote_mv, remote_rm, rsync)
+                            get_re_from_single_line, init_logger,
+                            remote_create_folder, remote_mv, remote_rm, rsync)
 
 
 class GetReFromSingleLineTest(TestCase):
@@ -141,3 +144,53 @@ class RsyncTest(TestCase):
         _os.popen.assert_called_once_with(
             "rsync -avz /a/b.py user@host:/c.py"
         )
+
+
+class LoggingConfigurationTests(TestCase):
+
+    def setUp(self):
+        self.logger = logging.getLogger("speechio")
+        self.orig_handlers = self.logger.handlers
+        self.logger.handlers = []
+        self.level = self.logger.level
+
+    def tearDown(self):
+        self.logger.handlers = self.orig_handlers
+        self.logger.level = self.level
+
+    def test_basic_configuration(self):
+        print 'before'
+        init_logger()
+        print 'done'
+
+        self.assertEqual(self.logger.level, logging.DEBUG)
+        self.assertEqual(len(self.logger.handlers), 1)
+        self.assertIsInstance(self.logger.handlers[0],
+                              logging.StreamHandler)
+        self.assertEqual(self.logger.handlers[0].stream,
+                         sys.stdout)
+        self.assertEqual(
+            self.logger.handlers[0].formatter._fmt,
+            "[%(levelname)s] %(asctime)s %(name)s  %(message)s"
+        )
+        self.assertEqual(
+            self.logger.handlers[0].formatter.datefmt,
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+
+class LoggingOutputTest(TestCase):
+
+    def test_logger(self):
+        logger = logging.getLogger("speechio")
+        with LogCapture() as log_capture:
+            logger.debug("DEBUG Test")
+            logger.info("INFO Test")
+            logger.warning("WARNING Test")
+            logger.error("ERROR Test")
+            log_capture.check(
+                ("speechio", "DEBUG", "DEBUG Test"),
+                ("speechio", "INFO", "INFO Test"),
+                ("speechio", "WARNING", "WARNING Test"),
+                ("speechio", "ERROR", "ERROR Test")
+            )
