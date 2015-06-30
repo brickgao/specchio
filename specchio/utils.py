@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import fnmatch
+import logging
+import logging.config
 import os
 import re
 
@@ -148,3 +150,10 @@ def rsync(dst_ssh, src_path, dst_path):
     """
     command = "rsync -avz {0} {1}:{2}".format(src_path, dst_ssh, dst_path)
     os.popen(command)
+
+
+def init_logger():
+    logging.config.fileConfig('speechio/config/logging.conf')
+
+
+logger = logging.getLogger()
