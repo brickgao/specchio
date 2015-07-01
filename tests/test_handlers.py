@@ -60,7 +60,7 @@ class SpecchioEventHandlerTest(TestCase):
         _remote_create_folder.return_value = True
         _os.path.abspath.return_value = "/a/test1.py"
         _os.path.join.return_value = "/b/a/test1.py"
-        _event = FileModifiedEvent(src_path="/test1.py")
+        _event = FileModifiedEvent(src_path="/a/test1.py")
         self.handler.on_modified(_event)
         _rsync.assert_called_once_with(
             dst_ssh=self.handler.dst_ssh,
