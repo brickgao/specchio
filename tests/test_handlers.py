@@ -24,8 +24,8 @@ class SpecchioEventHandlerTest(TestCase):
         self.handler.gitignore_dict = {
             "/a/.gitignore": {
                 1: [],
-                2: [re.compile(fnmatch.translate("/a/1.py"))],
-                3: [re.compile(fnmatch.translate("/a/test.py"))]
+                2: [re.compile(fnmatch.translate("1.py"))],
+                3: [re.compile(fnmatch.translate("test.py"))]
             }
         }
         self.handler.gitignore_list = ["/a/"]
@@ -105,8 +105,8 @@ class SpecchioEventHandlerTest(TestCase):
             {
                 "/a/.gitignore": {
                     1: [],
-                    2: [re.compile(fnmatch.translate("/a/1.py"))],
-                    3: [re.compile(fnmatch.translate("/a/test.py"))]
+                    2: [re.compile(fnmatch.translate("1.py"))],
+                    3: [re.compile(fnmatch.translate("test.py"))]
                 },
                 "/a/b/.gitignore": {
                     1: [],
