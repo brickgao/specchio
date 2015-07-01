@@ -67,11 +67,18 @@ class SpecchioEventHandler(FileSystemEventHandler):
         del self.gitignore_dict[gitignore_path]
         self.gitignore_list.remove(gitignore_path[:-10])
 
+    def get_relative_src_path(self, path):
+        _src_path = (self.src_path if self.src_path.endswith("/")
+                     else self.src_path + "/")
+        ret = path[len(_src_path):]
+        return "" if ret == "." else ret
+
     def on_created(self, event):
         abs_src_path = os.path.abspath(event.src_path)
         if self.is_ignore(abs_src_path):
             return
-        dst_path = os.path.join(self.dst_path, event.src_path)
+        relative_path = self.get_relative_src_path(event.src_path)
+        dst_path = os.path.join(self.dst_path, relative_path)
         if isinstance(event, DirCreatedEvent):
             logger.info("Create {} remotely".format(dst_path))
             remote_create_folder(dst_ssh=self.dst_ssh, dst_path=dst_path)
@@ -91,7 +98,8 @@ class SpecchioEventHandler(FileSystemEventHandler):
         if self.is_ignore(abs_src_path):
             return
         if isinstance(event, FileModifiedEvent):
-            dst_path = os.path.join(self.dst_path, event.src_path)
+            relative_path = self.get_relative_src_path(event.src_path)
+            dst_path = os.path.join(self.dst_path, relative_path)
             # Create folder of file
             dst_folder_path = dst_path[:-len(dst_path.split("/")[-1])]
             # If the file is `.gitignore`, update gitignore dict and list
@@ -111,7 +119,8 @@ class SpecchioEventHandler(FileSystemEventHandler):
         abs_src_path = os.path.abspath(event.src_path)
         if self.is_ignore(abs_src_path):
             return
-        dst_path = os.path.join(self.dst_path, event.src_path)
+        relative_path = self.get_relative_src_path(event.src_path)
+        dst_path = os.path.join(self.dst_path, relative_path)
         # If the file is `.gitignore`, remove this `gitignore` in dict and list
         if dst_path.split("/")[-1] == ".gitignore":
             logger.info("Remove some ignore pattern, because changed "
@@ -124,12 +133,14 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def on_moved(self, event):
         abs_src_src_path = os.path.abspath(event.src_path)
-        abs_src_dst_path = os.path.abspath(event.src_path)
+        abs_src_dst_path = os.path.abspath(event.dest_path)
         src_ignore_tag, dst_ignore_tag = (
             self.is_ignore(abs_src_src_path), self.is_ignore(abs_src_dst_path)
         )
-        dst_src_path = os.path.join(self.dst_path, event.src_path)
-        dst_dst_path = os.path.join(self.dst_path, event.dest_path)
+        relative_src_path = self.get_relative_src_path(event.src_path)
+        relative_dst_path = self.get_relative_src_path(event.dest_path)
+        dst_src_path = os.path.join(self.dst_path, relative_src_path)
+        dst_dst_path = os.path.join(self.dst_path, relative_dst_path)
         if src_ignore_tag and dst_ignore_tag:
             return
         elif dst_ignore_tag:
