@@ -34,12 +34,14 @@ class SpecchioEventHandler(FileSystemEventHandler):
         for gitignore_folder_path in self.gitignore_list:
             gitignore_path = gitignore_folder_path + ".gitignore"
             if file_or_dir_path.startswith(gitignore_folder_path):
-                print gitignore_folder_path
+                _relative_file_or_dir_path = (
+                    file_or_dir_path[len(gitignore_folder_path):]
+                )
                 for _re in self.gitignore_dict[gitignore_path][2]:
-                    if _re.match(file_or_dir_path):
+                    if _re.match(_relative_file_or_dir_path):
                         return False
                 for _re in self.gitignore_dict[gitignore_path][3]:
-                    if _re.match(file_or_dir_path):
+                    if _re.match(_relative_file_or_dir_path):
                         return True
         return False
 
