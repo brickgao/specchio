@@ -20,11 +20,11 @@ def main():
     if len(sys.argv) == 3:
         src_path = sys.argv[1].strip()
         dst_ssh, dst_path = sys.argv[2].strip().split(":")
+        init_logger()
+        logger.info("Initialize Specchio")
         event_handler = SpecchioEventHandler(
             src_path=src_path, dst_ssh=dst_path, dst_path=dst_path
         )
-        init_logger()
-        logger.info("Initialize Specchio")
         observer = Observer()
         observer.schedule(event_handler, src_path, recursive=True)
         observer.start()
