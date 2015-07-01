@@ -23,7 +23,7 @@ def main():
         init_logger()
         logger.info("Initialize Specchio")
         event_handler = SpecchioEventHandler(
-            src_path=src_path, dst_ssh=dst_path, dst_path=dst_path
+            src_path=src_path, dst_ssh=dst_ssh, dst_path=dst_path
         )
         observer = Observer()
         observer.schedule(event_handler, src_path, recursive=True)
