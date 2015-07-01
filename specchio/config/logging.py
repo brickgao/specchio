@@ -19,9 +19,10 @@ LOGGING_CONFIG = {
         }},
     "formatters": {
         "specchio": {
-            "format": "[%(levelname)s] %(asctime)s %(name)s  %(message)s",
+            "format": "%(log_color)s[%(levelname)s]%(reset)s"
+                      " %(asctime)s %(name)s  %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
-            "class": "logging.Formatter"
+            "()": "colorlog.ColoredFormatter",
         }
     }
 }

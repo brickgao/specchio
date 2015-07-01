@@ -17,8 +17,9 @@ setup(
     packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     install_requires=[
-        "testfixtures",
+        "colorlog",
         "mock",
+        "testfixtures",
         "watchdog"
     ],
     entry_points={

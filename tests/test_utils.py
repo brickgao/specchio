@@ -170,7 +170,8 @@ class LoggingConfigurationTests(TestCase):
                          sys.stdout)
         self.assertEqual(
             self.logger.handlers[0].formatter._fmt,
-            "[%(levelname)s] %(asctime)s %(name)s  %(message)s"
+            "%(log_color)s[%(levelname)s]%(reset)s"
+            " %(asctime)s %(name)s  %(message)s"
         )
         self.assertEqual(
             self.logger.handlers[0].formatter.datefmt,
