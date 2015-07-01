@@ -25,7 +25,8 @@ class SpecchioEventHandler(FileSystemEventHandler):
         self.src_path = src_path
         self.dst_ssh = dst_ssh
         self.dst_path = dst_path
-        self.git_path = os.path.join(self.src_path, ".git/")
+        self.git_path = os.path.join(os.path.abspath(self.src_path),
+                                     ".git/")
         super(SpecchioEventHandler, self).__init__()
 
     def is_ignore(self, file_or_dir_path):
