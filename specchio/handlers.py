@@ -34,6 +34,7 @@ class SpecchioEventHandler(FileSystemEventHandler):
         for gitignore_folder_path in self.gitignore_list:
             gitignore_path = gitignore_folder_path + ".gitignore"
             if file_or_dir_path.startswith(gitignore_folder_path):
+                print gitignore_folder_path
                 for _re in self.gitignore_dict[gitignore_path][2]:
                     if _re.match(file_or_dir_path):
                         return False
@@ -68,10 +69,20 @@ class SpecchioEventHandler(FileSystemEventHandler):
         abs_src_path = os.path.abspath(event.src_path)
         if self.is_ignore(abs_src_path):
             return
+        dst_path = os.path.join(self.dst_path, event.src_path)
         if isinstance(event, DirCreatedEvent):
-            dst_path = os.path.join(self.dst_path, event.src_path)
             logger.info("Create {} remotely".format(dst_path))
             remote_create_folder(dst_ssh=self.dst_ssh, dst_path=dst_path)
+        else:
+            logger.info("Rsync {} remotely".format(dst_path))
+            rsync(dst_ssh=self.dst_ssh, src_path=abs_src_path,
+                  dst_path=dst_path)
+            if dst_path.split("/")[-1] == ".gitignore":
+                logger.info("Update ignore pattern, because changed "
+                            "file({}) named `.gitignore` locally".format(
+                                abs_src_path
+                            ))
+                self.update_gitignore(abs_src_path)
 
     def on_modified(self, event):
         abs_src_path = os.path.abspath(event.src_path)
@@ -135,5 +146,5 @@ class SpecchioEventHandler(FileSystemEventHandler):
             logger.info("Move {} to {} remotely".format(
                 dst_src_path, dst_dst_path
             ))
-        self.init_gitignore(self.src_path)
         logger.info("Because of move method, try to update all ignore pattern")
+        self.init_gitignore(self.src_path)
