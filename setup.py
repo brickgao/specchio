@@ -18,12 +18,12 @@ setup(
     packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     install_requires=[
-        "colorlog >= 2.6.0 < 3.0.0",
-        "watchdog >= 0.8.3 < 1.0.0"
+        "colorlog >= 2.6.0, < 3.0.0",
+        "watchdog >= 0.8.3, < 1.0.0"
     ],
     tests_require=[
-        "mock >= 1.0.1 < 2.0.0",
-        "testfixtures >= 4.1.2 < 5.0.0"
+        "mock >= 1.0.1, < 2.0.0",
+        "testfixtures >= 4.1.2, < 5.0.0"
     ],
     test_suite="nose.collector",
     entry_points={
