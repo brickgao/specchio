@@ -7,7 +7,7 @@ Specchio is a tool that can help you rsync your code, it use `.gitignore` in git
 
 Install
 -------
-Clone the code, and then `python setup.py install`
+pip install Specchio
 
 Usage
 -----
