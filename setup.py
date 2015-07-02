@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from setuptools import find_packages, setup
 from specchio import __version__
 
-from setuptools import find_packages, setup
+tests_requirements = [
+    "mock >= 1.0.1, < 2.0.0",
+    "testfixtures >= 4.1.2, < 5.0.0"
+]
 
 setup(
     name="Specchio",
@@ -20,11 +24,8 @@ setup(
     install_requires=[
         "colorlog >= 2.6.0, < 3.0.0",
         "watchdog >= 0.8.3, < 1.0.0"
-    ],
-    tests_require=[
-        "mock >= 1.0.1, < 2.0.0",
-        "testfixtures >= 4.1.2, < 5.0.0"
-    ],
+    ] + tests_requirements,
+    tests_require=tests_requirements,
     test_suite="nose.collector",
     entry_points={
         "console_scripts": [
