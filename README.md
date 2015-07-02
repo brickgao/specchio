@@ -1,6 +1,8 @@
 Specchio
 ========
 
+[![Build Status](https://travis-ci.org/brickgao/specchio.svg?branch=master)](https://travis-ci.org/brickgao/specchio)
+
 Specchio is a tool that can help you rsync your code, it use `.gitignore` in git to discern which file is ignored.
 
 Install
