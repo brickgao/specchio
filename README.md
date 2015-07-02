@@ -1,7 +1,7 @@
 Specchio
 ========
 
-Specchio is a tool that can help you rsync your file, it use `.gitignore` in git to discern which file is ignored.
+Specchio is a tool that can help you rsync your code, it use `.gitignore` in git to discern which file is ignored.
 
 Install
 -------
