@@ -30,6 +30,13 @@ class SpecchioEventHandlerTest(TestCase):
         }
         self.handler.gitignore_list = ["/a/"]
 
+    def is_ignore_git_folder_test(self):
+        _file_or_dir_path = mock.Mock("/a/")
+        _file_or_dir_path.startswith.return_value = True
+        result = self.handler.is_ignore(_file_or_dir_path)
+        self.assertEqual(result, True)
+        _file_or_dir_path.startswith.called_once_with(self.handler.git_path)
+
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_create_folder")
     def on_created_test(self, _remote_create_folder, _os):
