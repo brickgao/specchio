@@ -7,7 +7,8 @@ from unittest import TestCase
 
 import mock
 from specchio.handlers import SpecchioEventHandler
-from watchdog.events import DirCreatedEvent, FileModifiedEvent, FileMovedEvent
+from watchdog.events import (DirCreatedEvent, FileCreatedEvent,
+                             FileModifiedEvent, FileMovedEvent)
 
 
 class SpecchioEventHandlerTest(TestCase):
@@ -67,7 +68,7 @@ class SpecchioEventHandlerTest(TestCase):
 
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_create_folder")
-    def on_created_test(self, _remote_create_folder, _os):
+    def on_created_folder_test(self, _remote_create_folder, _os):
         _remote_create_folder.return_value = True
         _os.path.abspath.return_value = "/a/test1.py"
         _os.path.join.return_value = "/b/a/test1.py"
@@ -77,6 +78,31 @@ class SpecchioEventHandlerTest(TestCase):
             dst_ssh=self.handler.dst_ssh,
             dst_path="/b/a/test1.py"
         )
+
+    @mock.patch("specchio.handlers.remote_create_folder")
+    @mock.patch("specchio.handlers.rsync")
+    @mock.patch("specchio.handlers.os")
+    def on_created_file_test(self, _os, _rsync,
+                             _remote_create_folder):
+        with mock.patch.object(
+                self.handler,
+                "update_gitignore"
+        ) as _update_gitignore:
+            _os.path.abspath.return_value = "/a/.gitignore"
+            _rsync.return_value = True
+            _update_gitignore.return_value = True
+            _remote_create_folder.return_value = True
+            _os.path.join.return_value = "/b/a/.gitignore"
+            _event = FileCreatedEvent(src_path="/a/.gitignore")
+            self.handler.on_created(_event)
+            _remote_create_folder.assert_called_once_with(
+                dst_ssh=self.handler.dst_ssh,
+                dst_path="/b/a/"
+            )
+            _rsync.assert_called_once_with(dst_ssh=self.handler.dst_ssh,
+                                           dst_path="/b/a/.gitignore",
+                                           src_path="/a/.gitignore")
+            _update_gitignore.assert_called_once_with("/a/.gitignore")
 
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_create_folder")

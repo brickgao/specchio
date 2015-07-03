@@ -84,6 +84,11 @@ class SpecchioEventHandler(FileSystemEventHandler):
             logger.info("Create {} remotely".format(dst_path))
             remote_create_folder(dst_ssh=self.dst_ssh, dst_path=dst_path)
         else:
+            dst_path = os.path.join(self.dst_path, relative_path)
+            # Create folder of file
+            dst_folder_path = dst_path[:-len(dst_path.split("/")[-1])]
+            remote_create_folder(dst_ssh=self.dst_ssh,
+                                 dst_path=dst_folder_path)
             logger.info("Rsync {} remotely".format(dst_path))
             rsync(dst_ssh=self.dst_ssh, src_path=abs_src_path,
                   dst_path=dst_path)
