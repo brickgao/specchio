@@ -7,11 +7,10 @@ import sys
 from unittest import TestCase
 
 import mock
-from testfixtures import LogCapture
-
 from specchio.utils import (dfs_get_gitignore, get_all_re,
                             get_re_from_single_line, init_logger,
                             remote_create_folder, remote_mv, remote_rm, rsync)
+from testfixtures import LogCapture
 
 
 class GetReFromSingleLineTest(TestCase):
@@ -67,19 +66,24 @@ class GetReFromSingleLineTest(TestCase):
 
 class DFSGetGitignoreTest(TestCase):
 
+    @mock.patch("specchio.utils.dfs_get_gitignore")
     @mock.patch("specchio.utils.os")
-    def test_dfs_get_gitignore(self, _os):
+    def test_dfs_get_gitignore(self, _os, _dfs_get_gitignore):
         _os.path.abspath.return_value = "/young/simple"
         _os.listdir.return_value = ["naive", ".gitignore"]
         _os.path.join.side_effect = [
             "/young/simple/naive",
             "/young/simple/.gitignore"
         ]
-        _os.path.isdir.return_value = False
+        _os.path.isdir.side_effect = [True, False]
+        _dfs_get_gitignore.return_value = ["/young/simple/naive/.gitignore"]
         result = dfs_get_gitignore("/young/simple")
         self.assertEqual(
             result,
-            ["/young/simple/.gitignore"]
+            [
+                "/young/simple/naive/.gitignore",
+                "/young/simple/.gitignore"
+            ]
         )
 
 
