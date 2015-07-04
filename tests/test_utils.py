@@ -36,9 +36,9 @@ class GetReFromSingleLineTest(TestCase):
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_from_simple_line(self, _fnmatch):
-        result = get_re_from_single_line("excited/*.*")
+        result = get_re_from_single_line("excited/")
         self.assertEqual(result[0], 3)
-        _fnmatch.translate.assert_called_once_with("excited/*.*")
+        _fnmatch.translate.assert_called_once_with("excited/*")
 
     @mock.patch("specchio.utils.fnmatch")
     def test_get_re_with_negate_pattern(self, _fnmatch):
