@@ -8,7 +8,8 @@ from unittest import TestCase
 import mock
 from specchio.handlers import SpecchioEventHandler
 from watchdog.events import (DirCreatedEvent, FileCreatedEvent,
-                             FileModifiedEvent, FileMovedEvent)
+                             FileDeletedEvent, FileModifiedEvent,
+                             FileMovedEvent)
 
 
 class SpecchioEventHandlerTest(TestCase):
@@ -193,6 +194,35 @@ class SpecchioEventHandlerTest(TestCase):
         )
         self.handler.gitignore_list = _handler_gitignore_list
         self.handler.gitignore_dict = _handler_gitignore_dict
+
+    @mock.patch("specchio.handlers.os")
+    @mock.patch("specchio.handlers.remote_rm")
+    def on_deleted_test(self, _remote_rm, _os):
+        _os.path.abspath.return_value = "/a/test1.py"
+        _os.path.join.return_value = "/b/a/test1.py"
+        _remote_rm.return_value = True
+        _event = FileDeletedEvent(src_path="/a/test1.py")
+        self.handler.on_deleted(_event)
+        _os.path.abspath.assert_called_once_with("/a/test1.py")
+        _os.path.join.assert_called_once_with(
+            "/b/a/",
+            "test1.py"
+        )
+        _remote_rm.assert_called_once_with(
+            dst_ssh=self.handler.dst_ssh,
+            dst_path="/b/a/test1.py"
+        )
+
+    @mock.patch("specchio.handlers.os")
+    @mock.patch("specchio.handlers.remote_rm")
+    def on_delete_ignore_test(self, _remote_rm, _os):
+        _os.path.abspath.return_value = "/a/test.py"
+        _event = FileDeletedEvent(src_path="/a/test.py")
+        self.handler.on_deleted(_event)
+        _os.path.abspath.assert_called_once_with(
+            "/a/test.py"
+        )
+        self.assertEqual(_os.path.join.call_count, 0)
 
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_mv")
