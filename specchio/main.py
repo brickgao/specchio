@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import time
 
@@ -17,10 +18,16 @@ def main():
 
     :return: None
     """
+    init_logger()
+    if os.popen("ssh -V").read() == "":
+        return logger.error("Specchio need `ssh`, "
+                            "but there is no `ssh` in the system")
+    if os.popen("rsync --version").read() == "":
+        return logger.error("Specchio need `rsync`, "
+                            "but there is no `rsync` in the system")
     if len(sys.argv) == 3:
         src_path = sys.argv[1].strip()
         dst_ssh, dst_path = sys.argv[2].strip().split(":")
-        init_logger()
         logger.info("Initialize Specchio")
         event_handler = SpecchioEventHandler(
             src_path=src_path, dst_ssh=dst_ssh, dst_path=dst_path
