@@ -119,21 +119,29 @@ class SpecchioEventHandlerTest(TestCase):
     @mock.patch("specchio.handlers.remote_create_folder")
     @mock.patch("specchio.handlers.rsync")
     def on_modified_test(self, _rsync, _remote_create_folder, _os):
-        _rsync.return_value = True
-        _remote_create_folder.return_value = True
-        _os.path.abspath.return_value = "/a/test1.py"
-        _os.path.join.return_value = "/b/a/test1.py"
-        _event = FileModifiedEvent(src_path="/a/test1.py")
-        self.handler.on_modified(_event)
-        _rsync.assert_called_once_with(
-            dst_ssh=self.handler.dst_ssh,
-            src_path="/a/test1.py",
-            dst_path="/b/a/test1.py"
-        )
-        _remote_create_folder.assert_called_once_with(
-            dst_ssh=self.handler.dst_ssh,
-            dst_path="/b/a/"
-        )
+        with mock.patch.object(
+                self.handler,
+                "update_gitignore"
+        ) as _update_gitignore:
+            _rsync.return_value = True
+            _remote_create_folder.return_value = True
+            _os.path.abspath.return_value = "/a/.gitignore"
+            _os.path.join.return_value = "/b/a/.gitignore"
+            _update_gitignore.return_value = True
+            _event = FileModifiedEvent(src_path="/a/.gitignore")
+            self.handler.on_modified(_event)
+            _rsync.assert_called_once_with(
+                dst_ssh=self.handler.dst_ssh,
+                src_path="/a/.gitignore",
+                dst_path="/b/a/.gitignore"
+            )
+            _remote_create_folder.assert_called_once_with(
+                dst_ssh=self.handler.dst_ssh,
+                dst_path="/b/a/"
+            )
+            _update_gitignore.assert_called_once_with(
+                "/a/.gitignore"
+            )
 
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_create_folder")
@@ -199,20 +207,26 @@ class SpecchioEventHandlerTest(TestCase):
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_rm")
     def on_deleted_test(self, _remote_rm, _os):
-        _os.path.abspath.return_value = "/a/test1.py"
-        _os.path.join.return_value = "/b/a/test1.py"
-        _remote_rm.return_value = True
-        _event = FileDeletedEvent(src_path="/a/test1.py")
-        self.handler.on_deleted(_event)
-        _os.path.abspath.assert_called_once_with("/a/test1.py")
-        _os.path.join.assert_called_once_with(
-            "/b/a/",
-            "test1.py"
-        )
-        _remote_rm.assert_called_once_with(
-            dst_ssh=self.handler.dst_ssh,
-            dst_path="/b/a/test1.py"
-        )
+        with mock.patch.object(
+            self.handler,
+            "del_gitignore"
+        ) as _del_gitignore:
+            _os.path.abspath.return_value = "/a/.gitignore"
+            _os.path.join.return_value = "/b/a/.gitignore"
+            _remote_rm.return_value = True
+            _del_gitignore.return_value = True
+            _event = FileDeletedEvent(src_path="/a/.gitignore")
+            self.handler.on_deleted(_event)
+            _os.path.abspath.assert_called_once_with("/a/.gitignore")
+            _os.path.join.assert_called_once_with(
+                "/b/a/",
+                ".gitignore"
+            )
+            _remote_rm.assert_called_once_with(
+                dst_ssh=self.handler.dst_ssh,
+                dst_path="/b/a/.gitignore"
+            )
+            _del_gitignore.assert_called_once_with("/a/.gitignore")
 
     @mock.patch("specchio.handlers.os")
     @mock.patch("specchio.handlers.remote_rm")
