@@ -18,8 +18,8 @@ class mainTest(TestCase):
     def test_main_invalid(self, _SpecchioEventHandler, _sys, _os):
         _sys.argv = ["specchio"]
         _arg2ret = {
-            "ssh -V": io.StringIO(u"test_msg"),
-            "rsync --version": io.StringIO(u"test_msg")
+            "whereis ssh": io.StringIO(u"test_msg"),
+            "whereis rsync": io.StringIO(u"test_msg")
         }
         _os.popen.side_effect = (lambda arg: _arg2ret[arg])
         main()
@@ -32,7 +32,7 @@ class mainTest(TestCase):
         _init_logger.return_value = True
         _sys.argv = ["specchio"]
         _arg2ret = {
-            "ssh -V": io.StringIO(u"")
+            "whereis ssh": io.StringIO(u"")
         }
         _os.popen.side_effect = (lambda arg: _arg2ret[arg])
         with LogCapture() as log_capture:
@@ -49,8 +49,8 @@ class mainTest(TestCase):
         _init_logger.return_value = True
         _sys.argv = ["specchio"]
         _arg2ret = {
-            "ssh -V": io.StringIO(u"test_msg"),
-            "rsync --version": io.StringIO(u"")
+            "whereis ssh": io.StringIO(u"test_msg"),
+            "whereis rsync": io.StringIO(u"")
         }
         _os.popen.side_effect = (lambda arg: _arg2ret[arg])
         with LogCapture() as log_capture:
@@ -69,8 +69,8 @@ class mainTest(TestCase):
     def test_main(self, _SpecchioEventHandler, _init_logger,
                   _Observer, _time, _sys, _os):
         _arg2ret = {
-            "ssh -V": io.StringIO(u"test_msg"),
-            "rsync --version": io.StringIO(u"test_msg")
+            "whereis ssh": io.StringIO(u"test_msg"),
+            "whereis rsync": io.StringIO(u"test_msg")
         }
         _init_logger.return_value = True
         _os.popen.side_effect = (lambda arg: _arg2ret[arg])

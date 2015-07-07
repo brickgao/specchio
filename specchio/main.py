@@ -19,10 +19,10 @@ def main():
     :return: None
     """
     init_logger()
-    if os.popen("ssh -V").read() == "":
+    if os.popen("whereis ssh").read() == "":
         return logger.error("Specchio need `ssh`, "
                             "but there is no `ssh` in the system")
-    if os.popen("rsync --version").read() == "":
+    if os.popen("whereis rsync").read() == "":
         return logger.error("Specchio need `rsync`, "
                             "but there is no `rsync` in the system")
     if len(sys.argv) == 3:
