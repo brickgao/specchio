@@ -64,13 +64,15 @@ class mainTest(TestCase):
     @mock.patch("specchio.main.sys")
     @mock.patch("specchio.main.time")
     @mock.patch("specchio.main.Observer")
+    @mock.patch("specchio.main.init_logger")
     @mock.patch("specchio.main.SpecchioEventHandler")
-    def test_main(self, _SpecchioEventHandler,
+    def test_main(self, _SpecchioEventHandler, _init_logger,
                   _Observer, _time, _sys, _os):
         _arg2ret = {
             "ssh -V": io.StringIO(u"test_msg"),
             "rsync --version": io.StringIO(u"test_msg")
         }
+        _init_logger.return_value = True
         _os.popen.side_effect = (lambda arg: _arg2ret[arg])
         _sys.argv = ["specchio", "/a/", "user@host:/b/a/"]
         _event_handler = mock.Mock()
@@ -78,7 +80,12 @@ class mainTest(TestCase):
         _observer_object = mock.Mock()
         _Observer.return_value = _observer_object
         _time.sleep = mock.PropertyMock(side_effect=KeyboardInterrupt)
-        main()
+        with LogCapture() as log_capture:
+            main()
+            log_capture.check(
+                ("specchio", "INFO", "Initialize Specchio"),
+                ("specchio", "INFO", "Specchio stopped, have a nice day :)")
+            )
         _SpecchioEventHandler.assert_called_once_with(
             src_path="/a/", dst_ssh="user@host", dst_path="/b/a/"
         )

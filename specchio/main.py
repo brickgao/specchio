@@ -41,5 +41,6 @@ def main():
         except KeyboardInterrupt:
             observer.stop()
         observer.join()
+        logger.info("Specchio stopped, have a nice day :)")
     else:
         print """Usage: specchio src/ user@host:dst/"""
