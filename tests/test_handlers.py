@@ -18,8 +18,8 @@ class SpecchioEventHandlerTest(TestCase):
     def setUp(self):
         with mock.patch.object(
             SpecchioEventHandler, "init_gitignore"
-        ) as init_gitignore:
-            init_gitignore.return_value = True
+        ) as _init_gitignore:
+            _init_gitignore.return_value = True
             self.handler = SpecchioEventHandler(
                 src_path="/a/",
                 dst_ssh="user@host",
@@ -34,6 +34,21 @@ class SpecchioEventHandlerTest(TestCase):
             }
         }
         self.handler.gitignore_list = ["/a/"]
+
+    def test_specchio_init_with_init_remote(self):
+        with mock.patch.object(
+            SpecchioEventHandler, "init_gitignore"
+        ) as _init_gitignore:
+            with mock.patch.object(
+                SpecchioEventHandler, "init_remote"
+            ) as _init_remote:
+                _init_gitignore.return_value = True
+                _init_remote.return_value = True
+                SpecchioEventHandler(
+                    src_path="/a/", dst_ssh="user@host",
+                    dst_path="/b/a/", is_init_remote=True
+                )
+                _init_remote.assert_called_once_with()
 
     def test_is_ignore_git_folder(self):
         _file_or_dir_path = mock.Mock("/a/")
