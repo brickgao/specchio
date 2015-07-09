@@ -3,7 +3,7 @@ Specchio
 
 [![Build Status](https://travis-ci.org/brickgao/specchio.svg?branch=master)](https://travis-ci.org/brickgao/specchio)
 [![Coverage Status](https://coveralls.io/repos/brickgao/specchio/badge.svg?branch=master)](https://coveralls.io/r/brickgao/specchio?branch=master)
-[![PyPI version](https://img.shields.io/pypi/v/specchio.svg?style=flat)](https://pypi.python.org/pypi/Specchio/0.0.2)
+[![PyPI version](https://img.shields.io/pypi/v/specchio.svg?style=flat)](https://pypi.python.org/pypi/Specchio)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Join the chat at https://gitter.im/brickgao/specchio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/brickgao/specchio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
