@@ -12,13 +12,14 @@ from specchio.utils import (dfs_get_gitignore, get_all_re, logger,
 
 class SpecchioEventHandler(FileSystemEventHandler):
 
-    def __init__(self, src_path, dst_ssh, dst_path):
+    def __init__(self, src_path, dst_ssh, dst_path, is_init_remote=False):
         """Constructor of `SpecchioEventHandler`
 
         :param src_path: str -- source path
         :param dst_ssh: str -- user name and host name of destination path
                                just like: user@host
         :param dst_path: str -- destination path
+        :param is_init_remote: bool -- initialize the file remotely or not
         :return: None
         """
         self.init_gitignore(src_path)
@@ -28,6 +29,34 @@ class SpecchioEventHandler(FileSystemEventHandler):
         self.git_path = os.path.join(os.path.abspath(self.src_path),
                                      ".git/")
         super(SpecchioEventHandler, self).__init__()
+        if is_init_remote:
+            logger.info("Starting to initialize the file remotely first")
+            self.init_remote()
+            logger.info("Initialization of the remote file has been done")
+
+    def init_remote(self):
+        # Rsync all files to remote system
+        for root_path, dirs_path, files_path in os.walk(self.src_path):
+            relative_src_folder_path = self.get_relative_src_path(
+                root_path
+            )
+            dst_folder_path = os.path.join(
+                self.dst_path, relative_src_folder_path
+            )
+            remote_create_folder(dst_ssh=self.dst_ssh,
+                                 dst_path=dst_folder_path)
+            for file_path in files_path:
+                src_file_path = os.path.join(root_path, file_path)
+                abs_src_file_path = os.path.abspath(src_file_path)
+                relative_src_file_path = self.get_relative_src_path(
+                    src_file_path
+                )
+                dst_file_path = os.path.join(
+                    self.dst_path, relative_src_file_path
+                )
+                if not self.is_ignore(abs_src_file_path):
+                    rsync(dst_ssh=self.dst_ssh, src_path=abs_src_file_path,
+                          dst_path=dst_file_path)
 
     def is_ignore(self, file_or_dir_path):
         if file_or_dir_path.startswith(self.git_path):
