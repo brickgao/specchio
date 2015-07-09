@@ -11,11 +11,19 @@ Specchio is a tool that can help you rsync your code, it uses `.gitignore` in gi
 
 Install
 -------
-pip install Specchio
+pip install specchio
 
 Usage
 -----
-Usage: specchio src/ user@host:dst/
+specchio [options] src/ user@host:dst/
+
+General Options
+-----
+--init-remote: Initialize remote folder, rsync all files to remote system.
+
+Note
+---
+If you want to use specchio without decrypting private keys each time, try to use `ssh-add` at first.
 
 Why I write Specchio
 -------------------
