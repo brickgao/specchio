@@ -6,8 +6,8 @@ import os
 from watchdog.events import (DirCreatedEvent, FileModifiedEvent,
                              FileSystemEventHandler)
 
-from specchio.utils import (dfs_get_gitignore, get_all_re, logger,
-                            remote_create_folder, remote_mv, remote_rm, rsync)
+from specchio.utils import (get_all_re, logger, remote_create_folder,
+                            remote_mv, remote_rm, rsync, walk_get_gitignore)
 
 
 class SpecchioEventHandler(FileSystemEventHandler):
@@ -77,7 +77,7 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def init_gitignore(self, src_path):
         logger.info("Loading ignore pattern from all `.gitignore`")
-        gitignore_list = dfs_get_gitignore(src_path)
+        gitignore_list = walk_get_gitignore(src_path)
         self.gitignore_dict = get_all_re(gitignore_list)
         # Match file or folder from the nearest `.gitignore`
         _gitignore_list = sorted(self.gitignore_dict.keys())[::-1]

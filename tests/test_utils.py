@@ -7,10 +7,11 @@ import sys
 from unittest import TestCase
 
 import mock
-from specchio.utils import (dfs_get_gitignore, get_all_re,
-                            get_re_from_single_line, init_logger,
-                            remote_create_folder, remote_mv, remote_rm, rsync)
 from testfixtures import LogCapture
+
+from specchio.utils import (get_all_re, get_re_from_single_line, init_logger,
+                            remote_create_folder, remote_mv, remote_rm, rsync,
+                            walk_get_gitignore)
 
 
 class GetReFromSingleLineTest(TestCase):
@@ -64,25 +65,31 @@ class GetReFromSingleLineTest(TestCase):
         _fnmatch.translate.assert_called_once_with("too_young.py")
 
 
-class DFSGetGitignoreTest(TestCase):
+class WalkGetGitignoreTest(TestCase):
 
-    @mock.patch("specchio.utils.dfs_get_gitignore")
     @mock.patch("specchio.utils.os")
-    def test_dfs_get_gitignore(self, _os, _dfs_get_gitignore):
-        _os.path.abspath.return_value = "/young/simple"
-        _os.listdir.return_value = ["naive", ".gitignore"]
-        _os.path.join.side_effect = [
-            "/young/simple/naive",
-            "/young/simple/.gitignore"
+    def test_walk_get_gitignore(self, _os):
+        _os.walk.return_value = [
+            ["/a/", ["c"], ["1.py", ".gitignore"]],
+            ["/a/c/", [], ["1.py", ".gitignore"]],
         ]
-        _os.path.isdir.side_effect = [True, False]
-        _dfs_get_gitignore.return_value = ["/young/simple/naive/.gitignore"]
-        result = dfs_get_gitignore("/young/simple")
+        arg2join = {
+            ("/a/", ".gitignore"): "/a/.gitignore",
+            ("/a/c/", ".gitignore"): "/a/c/.gitignore"
+        }
+        _os.path.join.side_effect = (lambda *arg: arg2join[arg])
+        arg2abs_path = {
+            "/a/": "/a/",
+            "/a/.gitignore": "/a/.gitignore",
+            "/a/c/.gitignore": "/a/c/.gitignore"
+        }
+        _os.path.abspath.side_effect = (lambda arg: arg2abs_path[arg])
+        result = walk_get_gitignore("/a/")
         self.assertEqual(
             result,
             [
-                "/young/simple/naive/.gitignore",
-                "/young/simple/.gitignore"
+                "/a/.gitignore",
+                "/a/c/.gitignore"
             ]
         )
 

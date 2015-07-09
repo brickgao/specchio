@@ -6,11 +6,11 @@ import re
 from unittest import TestCase
 
 import mock
-
-from specchio.handlers import SpecchioEventHandler
 from watchdog.events import (DirCreatedEvent, FileCreatedEvent,
                              FileDeletedEvent, FileModifiedEvent,
                              FileMovedEvent)
+
+from specchio.handlers import SpecchioEventHandler
 
 
 class SpecchioEventHandlerTest(TestCase):
@@ -42,10 +42,10 @@ class SpecchioEventHandlerTest(TestCase):
         self.assertEqual(result, True)
         _file_or_dir_path.startswith.called_once_with(self.handler.git_path)
 
-    @mock.patch("specchio.handlers.dfs_get_gitignore")
+    @mock.patch("specchio.handlers.walk_get_gitignore")
     @mock.patch("specchio.handlers.get_all_re")
-    def test_init_gitignore(self, _get_all_re, _dfs_get_gitignore):
-        _dfs_get_gitignore.return_value = ["/a/.gitignore"]
+    def test_init_gitignore(self, _get_all_re, _walk_get_gitignore):
+        _walk_get_gitignore.return_value = ["/a/.gitignore"]
         _get_all_re.return_value = {
             "/a/.gitignore": {
                 1: [],
@@ -58,7 +58,7 @@ class SpecchioEventHandlerTest(TestCase):
             dst_ssh="user@host",
             dst_path="/b/a/"
         )
-        _dfs_get_gitignore.called_once_with("/a/")
+        _walk_get_gitignore.called_once_with("/a/")
         self.assertEqual(handler.gitignore_list, ["/a/"])
         self.assertEqual(handler.gitignore_dict, {
             "/a/.gitignore": {

@@ -58,22 +58,20 @@ def get_re_from_single_line(line):
             return re_type, fnmatch.translate(line)
 
 
-def dfs_get_gitignore(base_path):
-    """Use depth first search to get all `.gitignore` under base_path
+def walk_get_gitignore(base_path):
+    """Use os.walk to get all `.gitignore` under base_path
 
     :param base_path: str -- the path to deal with
     :return: list of str -- the path of all `.gitignore`
     """
     base_path = os.path.abspath(base_path)
-    dir_list = os.listdir(base_path)
     result = []
-    for file_or_dir in dir_list:
-        file_or_dir_path = os.path.join(base_path, file_or_dir)
-        if file_or_dir == ".gitignore" and not os.path.isdir(file_or_dir_path):
-            result.append(file_or_dir_path)
-        elif os.path.isdir(file_or_dir_path):
-            # Continue to search `.gitignore`
-            result += dfs_get_gitignore(file_or_dir_path)
+    for root_path, dirs_path, files_path in os.walk(base_path):
+        for _file_path in files_path:
+            if _file_path == ".gitignore":
+                file_path = os.path.join(root_path, _file_path)
+                abs_file_path = os.path.abspath(file_path)
+                result.append(abs_file_path)
     return result
 
 
