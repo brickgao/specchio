@@ -20,10 +20,12 @@ def main():
     :return: None
     """
     init_logger()
-    if os.popen("whereis ssh").read() == "":
+    _popen_str = os.popen("whereis ssh").read().strip()
+    if _popen_str == "" or _popen_str == "ssh:":
         return logger.error("Specchio need `ssh`, "
                             "but there is no `ssh` in the system")
-    if os.popen("whereis rsync").read() == "":
+    _popen_str = os.popen("whereis rsync").read().strip()
+    if _popen_str == "" or _popen_str == "rsync:":
         return logger.error("Specchio need `rsync`, "
                             "but there is no `rsync` in the system")
     if len(sys.argv) >= 3:
