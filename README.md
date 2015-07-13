@@ -7,7 +7,7 @@ Specchio
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Join the chat at https://gitter.im/brickgao/specchio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/brickgao/specchio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Specchio is a tool that can help you to rsync your code, it uses `.gitignore` in git to discern which file is ignored.
+Specchio is a tool that can help you to rsync your code automatically, it uses `.gitignore` in git to discern which file is ignored.
 
 Install
 -------

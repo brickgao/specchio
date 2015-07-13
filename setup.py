@@ -14,8 +14,9 @@ setup(
     version=__version__,
     url="https://github.com/brickgao/specchio",
     license="MIT",
-    description="Specchio is a tool that can help you to rsync your file,"
-                "it uses `.gitignore` in git to discern which file is ignored.",
+    description="Specchio is a tool that can help you to rsync your file "
+                "automatically, it uses `.gitignore` in git to discern which"
+                " file is ignored.",
     long_description=open("README.md").read(),
     author="Xiongzhi Gao",
     author_email="brickgao@gmail.com",
