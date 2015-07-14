@@ -126,7 +126,7 @@ class SpecchioEventHandlerTest(TestCase):
     def test_on_created_ignore(self, _remote_create_folder, _os):
         _remote_create_folder.return_value = True
         _os.path.abspath.return_value = "/a/test.py"
-        _event = DirCreatedEvent(src_path="/a/test.py")
+        _event = FileCreatedEvent(src_path="/a/test.py")
         self.handler.on_created(_event)
         self.assertEqual(_remote_create_folder.call_count, 0)
 
@@ -325,7 +325,7 @@ class SpecchioEventHandlerTest(TestCase):
     def test_init_remote(self, _create_folder, _rsync, _os):
         _os.walk.return_value = [["/a/", [], ["1.py", "2.py"]]]
         _os.path.abspath.side_effect = [
-            "/a/1.py", "/a/2.py"
+            "/a/", "/a/1.py", "/a/2.py"
         ]
         _os.path.join.side_effect = [
             "/b/a",
@@ -335,7 +335,7 @@ class SpecchioEventHandlerTest(TestCase):
         _rsync.return_value = True
         _create_folder.return_value = True
         with mock.patch.object(self.handler, "is_ignore") as _is_ignore:
-            _is_ignore.side_effect = [True, False]
+            _is_ignore.side_effect = [False, True, False]
             self.handler.init_remote()
         _create_folder.assert_called_once_with(
             dst_ssh=self.handler.dst_ssh, dst_path="/b/a"

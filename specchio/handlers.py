@@ -43,8 +43,12 @@ class SpecchioEventHandler(FileSystemEventHandler):
             dst_folder_path = os.path.join(
                 self.dst_path, relative_src_folder_path
             )
-            remote_create_folder(dst_ssh=self.dst_ssh,
-                                 dst_path=dst_folder_path)
+            abs_src_folder_path = os.path.abspath(root_path) + "/"
+            if not self.is_ignore(abs_src_folder_path):
+                remote_create_folder(dst_ssh=self.dst_ssh,
+                                     dst_path=dst_folder_path)
+            else:
+                continue
             for file_path in files_path:
                 src_file_path = os.path.join(root_path, file_path)
                 abs_src_file_path = os.path.abspath(src_file_path)
@@ -105,8 +109,12 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         abs_src_path = os.path.abspath(event.src_path)
-        if self.is_ignore(abs_src_path):
-            return
+        if isinstance(event, DirCreatedEvent):
+            if self.is_ignore(abs_src_path + "/"):
+                return
+        else:
+            if self.is_ignore(abs_src_path):
+                return
         relative_path = self.get_relative_src_path(event.src_path)
         dst_path = os.path.join(self.dst_path, relative_path)
         if isinstance(event, DirCreatedEvent):
@@ -152,8 +160,12 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def on_deleted(self, event):
         abs_src_path = os.path.abspath(event.src_path)
-        if self.is_ignore(abs_src_path):
-            return
+        if isinstance(event, DirCreatedEvent):
+            if self.is_ignore(abs_src_path + "/"):
+                return
+        else:
+            if self.is_ignore(abs_src_path):
+                return
         relative_path = self.get_relative_src_path(event.src_path)
         dst_path = os.path.join(self.dst_path, relative_path)
         # If the file is `.gitignore`, remove this `gitignore` in dict and list
