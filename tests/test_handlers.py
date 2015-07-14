@@ -29,7 +29,8 @@ class SpecchioEventHandlerTest(TestCase):
             "/a/.gitignore": {
                 1: [],
                 2: [re.compile(fnmatch.translate("1.py"))],
-                3: [re.compile(fnmatch.translate("test.py"))]
+                3: [re.compile(fnmatch.translate("test.py")),
+                    re.compile(fnmatch.translate("t_folder/"))]
             }
         }
         self.handler.gitignore_list = ["/a/"]
@@ -192,7 +193,8 @@ class SpecchioEventHandlerTest(TestCase):
                 "/a/.gitignore": {
                     1: [],
                     2: [re.compile(fnmatch.translate("1.py"))],
-                    3: [re.compile(fnmatch.translate("test.py"))]
+                    3: [re.compile(fnmatch.translate("test.py")),
+                        re.compile(fnmatch.translate("t_folder/"))]
                 },
                 "/a/b/.gitignore": {
                     1: [],
@@ -323,19 +325,23 @@ class SpecchioEventHandlerTest(TestCase):
     @mock.patch("specchio.handlers.rsync")
     @mock.patch("specchio.handlers.remote_create_folder")
     def test_init_remote(self, _create_folder, _rsync, _os):
-        _os.walk.return_value = [["/a/", [], ["1.py", "2.py"]]]
+        _os.walk.return_value = [
+            ["/a/", [], ["1.py", "2.py"]],
+            ["/a/t_folder/", [], []]
+        ]
         _os.path.abspath.side_effect = [
-            "/a/", "/a/1.py", "/a/2.py"
+            "/a", "/a/1.py", "/a/2.py", "/a/t_folder"
         ]
         _os.path.join.side_effect = [
             "/b/a",
             "/a/1.py", "/b/a/1.py",
-            "/a/2.py", "/b/a/2.py"
+            "/a/2.py", "/b/a/2.py",
+            "/b/t_folder"
         ]
         _rsync.return_value = True
         _create_folder.return_value = True
         with mock.patch.object(self.handler, "is_ignore") as _is_ignore:
-            _is_ignore.side_effect = [False, True, False]
+            _is_ignore.side_effect = [False, True, False, True]
             self.handler.init_remote()
         _create_folder.assert_called_once_with(
             dst_ssh=self.handler.dst_ssh, dst_path="/b/a"

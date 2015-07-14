@@ -47,20 +47,19 @@ class SpecchioEventHandler(FileSystemEventHandler):
             if not self.is_ignore(abs_src_folder_path, True):
                 remote_create_folder(dst_ssh=self.dst_ssh,
                                      dst_path=dst_folder_path)
-            else:
-                continue
-            for file_path in files_path:
-                src_file_path = os.path.join(root_path, file_path)
-                abs_src_file_path = os.path.abspath(src_file_path)
-                relative_src_file_path = self.get_relative_src_path(
-                    src_file_path
-                )
-                dst_file_path = os.path.join(
-                    self.dst_path, relative_src_file_path
-                )
-                if not self.is_ignore(abs_src_file_path, False):
-                    rsync(dst_ssh=self.dst_ssh, src_path=abs_src_file_path,
-                          dst_path=dst_file_path)
+                for file_path in files_path:
+                    src_file_path = os.path.join(root_path, file_path)
+                    abs_src_file_path = os.path.abspath(src_file_path)
+                    relative_src_file_path = self.get_relative_src_path(
+                        src_file_path
+                    )
+                    dst_file_path = os.path.join(
+                        self.dst_path, relative_src_file_path
+                    )
+                    if not self.is_ignore(abs_src_file_path, False):
+                        rsync(dst_ssh=self.dst_ssh,
+                              src_path=abs_src_file_path,
+                              dst_path=dst_file_path)
 
     def is_ignore(self, file_or_dir_path, isdir):
         if isdir and not file_or_dir_path.endswith("/"):
