@@ -6,11 +6,10 @@ import re
 from unittest import TestCase
 
 import mock
+from specchio.handlers import SpecchioEventHandler
 from watchdog.events import (DirCreatedEvent, FileCreatedEvent,
                              FileDeletedEvent, FileModifiedEvent,
                              FileMovedEvent)
-
-from specchio.handlers import SpecchioEventHandler
 
 
 class SpecchioEventHandlerTest(TestCase):
@@ -52,8 +51,9 @@ class SpecchioEventHandlerTest(TestCase):
 
     def test_is_ignore_git_folder(self):
         _file_or_dir_path = mock.Mock("/a/")
+        _file_or_dir_path.endswith.return_value = True
         _file_or_dir_path.startswith.return_value = True
-        result = self.handler.is_ignore(_file_or_dir_path)
+        result = self.handler.is_ignore(_file_or_dir_path, True)
         self.assertEqual(result, True)
         _file_or_dir_path.startswith.called_once_with(self.handler.git_path)
 

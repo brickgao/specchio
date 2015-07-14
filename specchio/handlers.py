@@ -3,11 +3,11 @@
 
 import os
 
-from watchdog.events import (DirCreatedEvent, FileModifiedEvent,
-                             FileSystemEventHandler)
-
 from specchio.utils import (get_all_re, logger, remote_create_folder,
                             remote_mv, remote_rm, rsync, walk_get_gitignore)
+from watchdog.events import (DirCreatedEvent, DirDeletedEvent,
+                             DirModifiedEvent, DirMovedEvent,
+                             FileModifiedEvent, FileSystemEventHandler)
 
 
 class SpecchioEventHandler(FileSystemEventHandler):
@@ -43,8 +43,8 @@ class SpecchioEventHandler(FileSystemEventHandler):
             dst_folder_path = os.path.join(
                 self.dst_path, relative_src_folder_path
             )
-            abs_src_folder_path = os.path.abspath(root_path) + "/"
-            if not self.is_ignore(abs_src_folder_path):
+            abs_src_folder_path = os.path.abspath(root_path)
+            if not self.is_ignore(abs_src_folder_path, True):
                 remote_create_folder(dst_ssh=self.dst_ssh,
                                      dst_path=dst_folder_path)
             else:
@@ -58,11 +58,13 @@ class SpecchioEventHandler(FileSystemEventHandler):
                 dst_file_path = os.path.join(
                     self.dst_path, relative_src_file_path
                 )
-                if not self.is_ignore(abs_src_file_path):
+                if not self.is_ignore(abs_src_file_path, False):
                     rsync(dst_ssh=self.dst_ssh, src_path=abs_src_file_path,
                           dst_path=dst_file_path)
 
-    def is_ignore(self, file_or_dir_path):
+    def is_ignore(self, file_or_dir_path, isdir):
+        if isdir and not file_or_dir_path.endswith("/"):
+            file_or_dir_path += "/"
         if file_or_dir_path.startswith(self.git_path):
             return True
         for gitignore_folder_path in self.gitignore_list:
@@ -109,12 +111,9 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         abs_src_path = os.path.abspath(event.src_path)
-        if isinstance(event, DirCreatedEvent):
-            if self.is_ignore(abs_src_path + "/"):
-                return
-        else:
-            if self.is_ignore(abs_src_path):
-                return
+        isdir = isinstance(event, DirCreatedEvent)
+        if self.is_ignore(abs_src_path, isdir):
+            return
         relative_path = self.get_relative_src_path(event.src_path)
         dst_path = os.path.join(self.dst_path, relative_path)
         if isinstance(event, DirCreatedEvent):
@@ -138,7 +137,8 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         abs_src_path = os.path.abspath(event.src_path)
-        if self.is_ignore(abs_src_path):
+        isdir = isinstance(event, DirModifiedEvent)
+        if self.is_ignore(abs_src_path, isdir):
             return
         if isinstance(event, FileModifiedEvent):
             relative_path = self.get_relative_src_path(event.src_path)
@@ -160,12 +160,9 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def on_deleted(self, event):
         abs_src_path = os.path.abspath(event.src_path)
-        if isinstance(event, DirCreatedEvent):
-            if self.is_ignore(abs_src_path + "/"):
-                return
-        else:
-            if self.is_ignore(abs_src_path):
-                return
+        isdir = isinstance(event, DirDeletedEvent)
+        if self.is_ignore(abs_src_path, isdir):
+            return
         relative_path = self.get_relative_src_path(event.src_path)
         dst_path = os.path.join(self.dst_path, relative_path)
         # If the file is `.gitignore`, remove this `gitignore` in dict and list
@@ -179,10 +176,12 @@ class SpecchioEventHandler(FileSystemEventHandler):
         remote_rm(dst_ssh=self.dst_ssh, dst_path=dst_path)
 
     def on_moved(self, event):
+        isdir = isinstance(event, DirMovedEvent)
         abs_src_src_path = os.path.abspath(event.src_path)
         abs_src_dst_path = os.path.abspath(event.dest_path)
         src_ignore_tag, dst_ignore_tag = (
-            self.is_ignore(abs_src_src_path), self.is_ignore(abs_src_dst_path)
+            self.is_ignore(abs_src_src_path, isdir),
+            self.is_ignore(abs_src_dst_path, isdir)
         )
         relative_src_path = self.get_relative_src_path(event.src_path)
         relative_dst_path = self.get_relative_src_path(event.dest_path)
