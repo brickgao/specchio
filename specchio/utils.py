@@ -152,6 +152,24 @@ def rsync(dst_ssh, src_path, dst_path):
     os.popen(command)
 
 
+def rsync_multi(dst_ssh, folder_path, src_paths, dst_path):
+    """Rsync multiple files remotely
+
+    :param dst_ssh: str -- user name and host name of destination path
+                           just like: user@host
+    :param folder_path: str -- source of folder path
+    :param src_paths: list of str -- a list of src_path
+    :param dst_path: str -- destination of file
+    :return: None
+    """
+    _include_tuples = map(lambda s: "--include=\"/{}\"".format(s),
+                          src_paths)
+    command = "rsync -avrm {0} --exclude=\"*.*\" {1}/* {2}:{3}".format(
+        " ".join(_include_tuples), folder_path, dst_ssh, dst_path
+    )
+    os.popen(command)
+
+
 def init_logger():
     logging.config.dictConfig(LOGGING_CONFIG)
 

@@ -7,11 +7,10 @@ import sys
 from unittest import TestCase
 
 import mock
-from testfixtures import LogCapture
-
 from specchio.utils import (get_all_re, get_re_from_single_line, init_logger,
                             remote_create_folder, remote_mv, remote_rm, rsync,
-                            walk_get_gitignore)
+                            rsync_multi, walk_get_gitignore)
+from testfixtures import LogCapture
 
 
 class GetReFromSingleLineTest(TestCase):
@@ -154,6 +153,18 @@ class RsyncTest(TestCase):
         rsync("user@host", "/a/b.py", "/c.py")
         _os.popen.assert_called_once_with(
             "rsync -avz /a/b.py user@host:/c.py"
+        )
+
+
+class RsyncMultiTest(TestCase):
+
+    @mock.patch("specchio.utils.os")
+    def test_rsync_multi(self, _os):
+        _os.popen.return_value = True
+        rsync_multi("user@host", "/a", ["b.py", "c/1.py"], "/remote")
+        _os.popen.assert_called_once_with(
+            "rsync -avrm --include=\"/b.py\" --include=\"/c/1.py\""
+            " --exclude=\"*.*\" /a/* user@host:/remote"
         )
 
 
