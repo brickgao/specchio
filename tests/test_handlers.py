@@ -322,9 +322,8 @@ class SpecchioEventHandlerTest(TestCase):
         )
 
     @mock.patch("specchio.handlers.os")
-    @mock.patch("specchio.handlers.rsync")
-    @mock.patch("specchio.handlers.remote_create_folder")
-    def test_init_remote(self, _create_folder, _rsync, _os):
+    @mock.patch("specchio.handlers.rsync_multi")
+    def test_init_remote(self, _rsync_multi, _os):
         _os.walk.return_value = [
             ["/a/", [], ["1.py", "2.py"]],
             ["/a/t_folder/", [], []]
@@ -333,20 +332,13 @@ class SpecchioEventHandlerTest(TestCase):
             "/a", "/a/1.py", "/a/2.py", "/a/t_folder"
         ]
         _os.path.join.side_effect = [
-            "/b/a",
-            "/a/1.py", "/b/a/1.py",
-            "/a/2.py", "/b/a/2.py",
-            "/b/t_folder"
+            "/a/1.py", "/a/2.py"
         ]
-        _rsync.return_value = True
-        _create_folder.return_value = True
+        _rsync_multi.return_value = True
         with mock.patch.object(self.handler, "is_ignore") as _is_ignore:
             _is_ignore.side_effect = [False, True, False, True]
             self.handler.init_remote()
-        _create_folder.assert_called_once_with(
-            dst_ssh=self.handler.dst_ssh, dst_path="/b/a"
-        )
-        _rsync.assert_called_once_with(
-            dst_ssh=self.handler.dst_ssh, src_path="/a/2.py",
-            dst_path="/b/a/2.py",
+        _rsync_multi.assert_called_once_with(
+            dst_ssh=self.handler.dst_ssh, folder_path=self.handler.src_path,
+            src_paths=["2.py"], dst_path=self.handler.dst_path
         )

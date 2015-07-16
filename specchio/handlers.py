@@ -4,7 +4,8 @@
 import os
 
 from specchio.utils import (get_all_re, logger, remote_create_folder,
-                            remote_mv, remote_rm, rsync, walk_get_gitignore)
+                            remote_mv, remote_rm, rsync, rsync_multi,
+                            walk_get_gitignore)
 from watchdog.events import (DirCreatedEvent, DirDeletedEvent,
                              DirModifiedEvent, DirMovedEvent,
                              FileModifiedEvent, FileSystemEventHandler)
@@ -36,30 +37,20 @@ class SpecchioEventHandler(FileSystemEventHandler):
 
     def init_remote(self):
         # Rsync all files to remote system
+        _rsync_file_list = []
         for root_path, dirs_path, files_path in os.walk(self.src_path):
-            relative_src_folder_path = self.get_relative_src_path(
-                root_path
-            )
-            dst_folder_path = os.path.join(
-                self.dst_path, relative_src_folder_path
-            )
             abs_src_folder_path = os.path.abspath(root_path)
             if not self.is_ignore(abs_src_folder_path, True):
-                remote_create_folder(dst_ssh=self.dst_ssh,
-                                     dst_path=dst_folder_path)
                 for file_path in files_path:
                     src_file_path = os.path.join(root_path, file_path)
                     abs_src_file_path = os.path.abspath(src_file_path)
                     relative_src_file_path = self.get_relative_src_path(
                         src_file_path
                     )
-                    dst_file_path = os.path.join(
-                        self.dst_path, relative_src_file_path
-                    )
                     if not self.is_ignore(abs_src_file_path, False):
-                        rsync(dst_ssh=self.dst_ssh,
-                              src_path=abs_src_file_path,
-                              dst_path=dst_file_path)
+                        _rsync_file_list.append(relative_src_file_path)
+        rsync_multi(dst_ssh=self.dst_ssh, folder_path=self.src_path,
+                    src_paths=_rsync_file_list, dst_path=self.dst_path)
 
     def is_ignore(self, file_or_dir_path, isdir):
         if isdir and not file_or_dir_path.endswith("/"):
