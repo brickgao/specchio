@@ -164,7 +164,7 @@ def rsync_multi(dst_ssh, folder_path, src_paths, dst_path):
     """
     _include_tuples = map(lambda s: "--include=\"/{}\"".format(s),
                           src_paths)
-    command = "rsync -avrm {0} --exclude=\"*.*\" {1}/* {2}:{3}".format(
+    command = "rsync -avrm {0} --exclude=\"*.*\" {1} {2}:{3}".format(
         " ".join(_include_tuples), folder_path, dst_ssh, dst_path
     )
     os.popen(command)

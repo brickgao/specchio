@@ -164,7 +164,7 @@ class RsyncMultiTest(TestCase):
         rsync_multi("user@host", "/a", ["b.py", "c/1.py"], "/remote")
         _os.popen.assert_called_once_with(
             "rsync -avrm --include=\"/b.py\" --include=\"/c/1.py\""
-            " --exclude=\"*.*\" /a/* user@host:/remote"
+            " --exclude=\"*.*\" /a user@host:/remote"
         )
 
 
